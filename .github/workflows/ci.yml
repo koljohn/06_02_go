@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3       
+      - name: Setup Go environment             
+        uses: actions/setup-go@v5.0.0
+      - name: Build Binary
+        run: go build -o dummy-server.bin ./cmd/main.go 
+      - name: Simple Test
+        run: |
+          ./dummy-server.bin &
+          sleep 3
+          curl -s http://localhost:8888
+          kill $!
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: binary
+          path: ./dummy-server.bin
